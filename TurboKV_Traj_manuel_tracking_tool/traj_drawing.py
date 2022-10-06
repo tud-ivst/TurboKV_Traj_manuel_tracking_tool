@@ -289,7 +289,7 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
         current_frame=app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES)
         app.frame_panel.update(str(int(current_frame)) + " / " + str(int(app.video["frames"])) + " (" + str(np.round(current_frame/app.video["fps"]/60,2)) + " min)", False)
         # draw traj
-        if not app.trajectories_df.empty:
+        if not app.trajectories_df.empty and not app.video_state["show_markers"]:
             frame_range=250
             frame = draw_lines(app, frame, frame_range=frame_range)
             frame = draw_traj_points(app, frame, frame_range=frame_range)

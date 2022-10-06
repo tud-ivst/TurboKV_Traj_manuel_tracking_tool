@@ -44,7 +44,8 @@ class App:
             "change_frameskip_size":True,
             "set_class_mode":False,
             "last_save_time":None,
-            "image_resize":0.6
+            "image_resize":0.6,
+            "show_markers": True
         }
         self.trajectories_df = pd.DataFrame(columns=["id","class", "frame" ,"x", "y"])
         self.traj_id_now = 0

@@ -255,8 +255,8 @@ def keybindings(app):
     # mousewheel for forward and backward in the video
     app.window.bind("<MouseWheel>", lambda event: mouse_wheel(event, app=app))
     app.window.bind("<Button-2>", lambda event: mouse_button(event, app=app))
-    app.window.bind("<Right>", lambda event: jump_frames(event, app=app, forward=True))
-    app.window.bind("<Left>", lambda event: jump_frames(event, app=app, backward=False))
+    app.window.bind("<Right>", lambda event: jump_many_frames(event, app=app, forward=True))
+    app.window.bind("<Left>", lambda event: jump_many_frames(event, app=app, forward=False))
 
     # class and finishing of the traj
     app.window.bind("r", lambda event: finish_traj_r(event, app=app))
@@ -264,11 +264,25 @@ def keybindings(app):
     # jump to another traj
     app.window.bind("1", lambda event: jump_traj_befor(event, app=app))
     app.window.bind("2", lambda event: jump_traj_after(event, app=app))
+
+    app.window.bind("q", lambda event: jump_frames(event, app=app, forward=True))
+    app.window.bind("w", lambda event: jump_frames(event, app=app, forward=False))
+
+    app.window.bind("e", lambda event: disable_markers(event, app=app))
+
     # del
     app.window.bind("<Delete>", lambda event: del_traj(event, app=app))
     # pause
     app.window.bind("<space>", lambda event: pause_play(event, app=app))
-    
+
+def disable_markers(event, app):
+    if app.video_state["show_markers"]:
+        app.state_panel.update("disable markers")
+    else:
+        app.state_panel.update("show markers")
+    app.video_state["show_markers"] = not app.video_state["show_markers"]
+    traj_drawing.draw_frame_with_overlay(app, False)
+
 def pause_play(event, app):
     if app.video_state["pause"]:
         app.state_panel.update("play")
@@ -276,13 +290,21 @@ def pause_play(event, app):
         app.state_panel.update("pause")
     app.video_state["pause"] = not app.video_state["pause"]
 
-def jump_frames(event, app, forward):
+def jump_many_frames(event, app, forward):
     if forward:
         app.video_state["forward"] = True
         app.state_panel.update("forward")
     else:
         app.video_state["backward"] = True
         app.state_panel.update("backward")
+
+def jump_frames(event, app, forward):
+    if forward:
+        app.video_state["forward_frame"] = True
+        app.state_panel.update("forward_frame")
+    else:
+        app.video_state["backward_frame"] = True
+        app.state_panel.update("backward_frame")
 
 def finish_traj_r(event, app):
     app.trajectories_df.loc[app.trajectories_df["id"] == app.traj_id_now, "class"] = "Rad"
