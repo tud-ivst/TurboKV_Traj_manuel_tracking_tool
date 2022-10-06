@@ -193,9 +193,10 @@ def calculate_x_y_deltas(angle, hyp):
 def draw_multiple_crosses(frame, points, thickness, traj_colors, boundary_color):
     for index, row in points.reset_index(drop=True).iterrows():
         # first the background
-        frame = draw_a_cross(frame, row["x"], row["y"], 12, boundary_color, thickness)
+        #frame = draw_a_cross(frame, row["x"], row["y"], 12, boundary_color, thickness)
+        cv2.circle(frame, (row["x"], row["y"]), 11, boundary_color, thickness)
 
-        frame = draw_a_cross(frame, row["x"], row["y"], 11, traj_colors[row["class"]], thickness-1)
+        frame = draw_a_cross(frame, row["x"], row["y"], 11, traj_colors[row["class"]], thickness)
     return frame
 
 
@@ -222,10 +223,10 @@ def draw_traj_points(app, frame, frame_range, small_frame_range=12):
     point_at_the_moment = points_in_framerange.loc[selection]
     # points in the framerange (but not selected and not at the moment)
     points_in_framerange = points_in_framerange.loc[~selection]
-    frame = draw_multiple_crosses(frame, points_in_framerange, 3, app.traj_colors, (0, 0, 0))
-    frame = draw_multiple_crosses(frame, point_at_the_moment, 3, app.traj_colors, (255, 255, 255))
-    frame = draw_multiple_crosses(frame, points_selected, 3, app.traj_colors, (240, 50, 230))
-    frame = draw_multiple_crosses(frame, points_selected_at_moment, 3, app.traj_colors, (255, 255, 255))
+    frame = draw_multiple_crosses(frame, points_in_framerange, 1, app.traj_colors, (0, 0, 0))
+    frame = draw_multiple_crosses(frame, point_at_the_moment, 1, app.traj_colors, (255, 255, 255))
+    frame = draw_multiple_crosses(frame, points_selected, 1, app.traj_colors, (240, 50, 230))
+    frame = draw_multiple_crosses(frame, points_selected_at_moment, 1, app.traj_colors, (255, 255, 255))
     return frame
 
 
