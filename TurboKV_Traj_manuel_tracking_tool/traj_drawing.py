@@ -285,6 +285,8 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
             app.video["last_showen_frame"] = copy.copy(frame)
     # only go forward if frame is valid (ret) or just the 
     if ret:
+        current_frame=app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES)
+        app.frame_panel.update(str(int(current_frame)) + " / " + str(int(app.video["frames"])) + " (" + str(np.round(current_frame/app.video["fps"]/60,2)) + " min)", False)
         # draw traj
         if not app.trajectories_df.empty:
             frame_range=250

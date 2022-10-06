@@ -15,25 +15,29 @@ class StatePanel:
     """feedback information for the user
     """
     # initialize StatePanel
-    def __init__(self, window, row, column, sticky):
+    def __init__(self, window, row, column, sticky, width):
         """init state panel
         """
         self.scrollbar = tk.Scrollbar(window)
-        self.text = tk.Text(window, height=2, width=100, yscrollcommand=self.scrollbar.set, state="disabled")
+        self.text = tk.Text(window, height=2, width=width, yscrollcommand=self.scrollbar.set, state="disabled")
         self.scrollbar.config(command=self.text.yview)
         self.scrollbar.grid(row=row, column=column, columnspan=2, padx='5', pady='3', sticky='e')
         self.text.grid(row=row, column=column, padx='5', pady='3', sticky=sticky)
 
-    def update(self, text):
+    def update(self, text, with_minus=True):
         """new information to show --> update
 
         Args:
             text (str): new text to show
         """
         self.text.config(state="normal")
-        self.text.insert(tk.END, "- " + str(text) + "\n")
+        if with_minus:
+            self.text.insert(tk.END, "\n"+"- " + str(text))
+        else:
+            self.text.insert(tk.END, "\n"+str(text))
         self.text.see("end")
         self.text.config(state="disabled")
+
 
     def move(self, row, column, sticky, columnspan=2):
         """change position
@@ -251,15 +255,35 @@ def keybindings(app):
     # mousewheel for forward and backward in the video
     app.window.bind("<MouseWheel>", lambda event: mouse_wheel(event, app=app))
     app.window.bind("<Button-2>", lambda event: mouse_button(event, app=app))
+    app.window.bind("<Right>", lambda event: jump_frames(event, app=app, forward=True))
+    app.window.bind("<Left>", lambda event: jump_frames(event, app=app, backward=False))
+
     # class and finishing of the traj
     app.window.bind("r", lambda event: finish_traj_r(event, app=app))
     app.window.bind("f", lambda event: finish_traj_f(event, app=app))
     # jump to another traj
-    app.window.bind("<Left>", lambda event: jump_traj_befor(event, app=app))
-    app.window.bind("<Right>", lambda event: jump_traj_after(event, app=app))
+    app.window.bind("1", lambda event: jump_traj_befor(event, app=app))
+    app.window.bind("2", lambda event: jump_traj_after(event, app=app))
     # del
     app.window.bind("<Delete>", lambda event: del_traj(event, app=app))
+    # pause
+    app.window.bind("<space>", lambda event: pause_play(event, app=app))
     
+def pause_play(event, app):
+    if app.video_state["pause"]:
+        app.state_panel.update("play")
+    else:
+        app.state_panel.update("pause")
+    app.video_state["pause"] = not app.video_state["pause"]
+
+def jump_frames(event, app, forward):
+    if forward:
+        app.video_state["forward"] = True
+        app.state_panel.update("forward")
+    else:
+        app.video_state["backward"] = True
+        app.state_panel.update("backward")
+
 def finish_traj_r(event, app):
     app.trajectories_df.loc[app.trajectories_df["id"] == app.traj_id_now, "class"] = "Rad"
     app.traj_finished = True
@@ -279,7 +303,6 @@ def jump_traj_befor(event, app):
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, befor=True)
         traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("selected trajectory befor")
-
 
 def jump_traj_after(event, app):
     if app.traj_finished == True and not app.trajectories_df.empty:    

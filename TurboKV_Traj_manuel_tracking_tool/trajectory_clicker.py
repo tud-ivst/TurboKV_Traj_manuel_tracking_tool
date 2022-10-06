@@ -29,7 +29,8 @@ class App:
         self.canvas = None
         self.video = {}
         self.label_hotkeys = None
-        self.state_panel = traj_tool_helpers.StatePanel(self.window, 0, 0, "w")
+        self.state_panel = traj_tool_helpers.StatePanel(self.window, 0, 0, "w", width=50)
+        self.frame_panel = traj_tool_helpers.StatePanel(self.window, 0, 1, "w", width=50)
         self.queue = None
         self.video_state = {
             "escape": False,
@@ -79,7 +80,7 @@ class App:
         # Create a canvas that can fit the above video source size
         if self.canvas is None:
             self.canvas = tk.Canvas(self.window, width=self.video["width"], height=self.video["height"])
-        self.canvas.grid(row=1, column=0, padx='5', pady='3', sticky='w')
+        self.canvas.grid(row=1, column=0, padx='5', pady='3', sticky='w', columnspan=2)
         self.queue = queue.Queue()
         # close window on closing button
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
