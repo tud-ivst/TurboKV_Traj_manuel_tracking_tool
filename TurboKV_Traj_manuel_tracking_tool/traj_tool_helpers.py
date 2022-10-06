@@ -2,12 +2,11 @@ import tkinter as tk
 import threading
 import time
 import cv2
-import keyboard
 import queue
 import copy
 import PIL.Image
 import PIL.ImageTk
-import traj_drawing
+import TurboKV_Traj_manuel_tracking_tool.traj_drawing as traj_drawing
 from pathlib import Path
 import os
 import time

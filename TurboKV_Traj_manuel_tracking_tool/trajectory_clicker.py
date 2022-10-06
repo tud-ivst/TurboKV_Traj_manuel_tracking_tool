@@ -1,12 +1,12 @@
 import tkinter as tk
-import traj_tool_helpers
+import TurboKV_Traj_manuel_tracking_tool.traj_tool_helpers as traj_tool_helpers
 from tkinter import filedialog
 from tkinter import messagebox
 import cv2
 import queue
 import threading
 import pandas as pd
-import traj_drawing
+import TurboKV_Traj_manuel_tracking_tool.traj_drawing as traj_drawing
 import time
 
 class App:
