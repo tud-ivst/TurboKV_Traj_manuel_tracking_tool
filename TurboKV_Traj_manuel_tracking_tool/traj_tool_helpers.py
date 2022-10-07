@@ -176,6 +176,7 @@ def update_video_frame(app):
 
         app.video_state["current_frameskip"] = query_video_keys(app.video_state)
         current_frameskip = app.video_state["current_frameskip"] 
+        # autosave
         if time.time() - app.video_state["last_save_time"] > 600:
             safe_traj(app, auto_save=True)
             app.video_state["last_save_time"] = time.time()
@@ -255,6 +256,8 @@ def keybindings(app):
     # mousewheel for forward and backward in the video
     app.window.bind("<MouseWheel>", lambda event: mouse_wheel(event, app=app))
     app.window.bind("<Button-2>", lambda event: mouse_button(event, app=app))
+    app.window.bind("a", lambda event: mouse_button(event, app=app))
+    
     app.window.bind("<Right>", lambda event: jump_many_frames(event, app=app, forward=True))
     app.window.bind("<Left>", lambda event: jump_many_frames(event, app=app, forward=False))
 
@@ -265,8 +268,8 @@ def keybindings(app):
     app.window.bind("1", lambda event: jump_traj_befor(event, app=app))
     app.window.bind("2", lambda event: jump_traj_after(event, app=app))
 
-    app.window.bind("q", lambda event: jump_frames(event, app=app, forward=True))
-    app.window.bind("w", lambda event: jump_frames(event, app=app, forward=False))
+    app.window.bind("q", lambda event: jump_frames(event, app=app, forward=False))
+    app.window.bind("w", lambda event: jump_frames(event, app=app, forward=True))
 
     app.window.bind("e", lambda event: disable_markers(event, app=app))
 
@@ -338,7 +341,7 @@ def del_traj(event, app):
         app.trajectories_df = app.trajectories_df.loc[app.trajectories_df["id"] != app.traj_id_now]
         traj_del = copy.deepcopy(app.traj_id_now)
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, befor=False)
-        traj_drawing.draw_frame_with_overlay(app, True)
+        traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("deleted traj " + str(traj_del) + "; now selected:" + str(app.traj_id_now))
 
 

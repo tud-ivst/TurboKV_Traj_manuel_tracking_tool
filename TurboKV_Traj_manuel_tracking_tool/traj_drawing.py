@@ -58,8 +58,8 @@ def draw_lines(app, frame, frame_range):
         (app.trajectories_df["frame"] < current_frame + frame_range/2)]
     ids_traj_to_show = points_in_range["id"].unique().tolist() + [app.traj_id_now]
     points_of_traj_in_range = app.trajectories_df.loc[app.trajectories_df["id"].isin(ids_traj_to_show)]
-    points_of_traj_in_range["x2"] = [None] + points_of_traj_in_range["x"].to_list()[:-1]
-    points_of_traj_in_range["y2"] = [None] + points_of_traj_in_range["y"].to_list()[:-1]
+    points_of_traj_in_range["x2"] = [None] + points_of_traj_in_range["x"].copy().to_list()[:-1]
+    points_of_traj_in_range["y2"] = [None] + points_of_traj_in_range["y"].copy().to_list()[:-1]
     for index in ids_traj_to_show:
         
         points_of_traj = points_of_traj_in_range.loc[points_of_traj_in_range["id"]==index]
@@ -289,7 +289,7 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
         current_frame=app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES)
         app.frame_panel.update(str(int(current_frame)) + " / " + str(int(app.video["frames"])) + " (" + str(np.round(current_frame/app.video["fps"]/60,2)) + " min)", False)
         # draw traj
-        if not app.trajectories_df.empty and not app.video_state["show_markers"]:
+        if not app.trajectories_df.empty and app.video_state["show_markers"]:
             frame_range=250
             frame = draw_lines(app, frame, frame_range=frame_range)
             frame = draw_traj_points(app, frame, frame_range=frame_range)

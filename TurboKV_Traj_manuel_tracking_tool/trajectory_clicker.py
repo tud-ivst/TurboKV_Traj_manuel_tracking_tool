@@ -131,11 +131,11 @@ def help(app):
     text.config(state="disabled")
 
 def help_text():
-    return ("KEY - FUNKTION" + "\n" +
+    return ("KEY - FUNKTION" + "\n\n" +
         "Mouse Left | Mouse Right " + " - set trajectory point" + "\n" +
         "Mouse Wheel forward | W  "+ " - jump some frames forward"+ "\n" +
         "Mouse Wheel backward | Q "+" - jump some frames backward"+ "\n" +
-        "Mouse Wheel Click        " +" - toggle bjump size (for both jump options)"+ "\n" +
+        "Mouse Wheel Click | A    " +" - toggle bjump size (for both jump options)"+ "\n" +
         "Right                    " + " - jump many frames forward" +  "\n" +
         "Left                     " + " - jump many frames backward" +  "\n" +
         "1                        " + " - select and jump to trajectory befor" +  "\n" +
@@ -145,7 +145,9 @@ def help_text():
         "F                        " + " - finish pedestrian trajectory" +  "\n" +
         "R                        " + " - finish biker trajectory" +  "\n" +
         "Space                    " + " - play/pause" +  "\n" +
-        "all 10 min the program safe the trajectory data as safety"
+        "\n"+"all 10 min the program safe the trajectory data as safety"
+        "\n"+"safes always at the video location and under the same name (auto_save named diffrently)"
+        "\n"+"change Name if you track a video in muliple sessions"
 
 
     )
