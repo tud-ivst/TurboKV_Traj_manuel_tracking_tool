@@ -47,6 +47,7 @@ class App:
             "image_resize":0.6,
             "show_markers": True
         }
+        self.gui = {}
         self.trajectories_df = pd.DataFrame(columns=["id","class", "frame" ,"x", "y"])
         self.traj_id_now = 0
         self.traj_finished = True
@@ -63,6 +64,7 @@ class App:
         self.window.config(menu=self.menu_bar)
         self.menu_bar.add_command(label="Load Video", command=lambda: self.load_video_draw_first_frame())
         self.menu_bar.add_command(label="Save Trajectory Data", command=lambda: traj_tool_helpers.safe_traj(self))
+        self.menu_bar.add_command(label="Help", command=lambda: help(self))
 
     def load_video_draw_first_frame(self):
         self.video_state["last_save_time"] = time.time()
@@ -119,7 +121,34 @@ class App:
         for thread in threading.enumerate(): 
             print(thread.name)
         
+def help(app):
+    app.gui["toplevelwindow"] = tk.Toplevel(app.window)
+    app.gui["toplevelwindow"].title("Help")
+    app.gui["toplevelwindow"].geometry("600x" + str(24*27))
+    text = tk.Text(app.gui["toplevelwindow"], height=20, width=100)
+    text.grid(row=0, column=0)
+    text.insert(tk.END, help_text())
+    text.config(state="disabled")
 
+def help_text():
+    return ("KEY - FUNKTION" + "\n" +
+        "Mouse Left | Mouse Right " + " - set trajectory point" + "\n" +
+        "Mouse Wheel forward | W  "+ " - jump some frames forward"+ "\n" +
+        "Mouse Wheel backward | Q "+" - jump some frames backward"+ "\n" +
+        "Mouse Wheel Click        " +" - toggle bjump size (for both jump options)"+ "\n" +
+        "Right                    " + " - jump many frames forward" +  "\n" +
+        "Left                     " + " - jump many frames backward" +  "\n" +
+        "1                        " + " - select and jump to trajectory befor" +  "\n" +
+        "2                        " + " - select and jump to trajectory afterwards" +  "\n" +
+        "E                        " + " - show markers/disable markers" +  "\n" +
+        "Delete                   " + " - delete selected trajectory (marked magenta)" +  "\n" +
+        "F                        " + " - finish pedestrian trajectory" +  "\n" +
+        "R                        " + " - finish biker trajectory" +  "\n" +
+        "Space                    " + " - play/pause" +  "\n" +
+        "all 10 min the program safe the trajectory data as safety"
+
+
+    )
 
 def mainfunction():
     """start the App
