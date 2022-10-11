@@ -340,6 +340,7 @@ def del_traj(event, app):
     if not app.trajectories_df.empty:
         app.trajectories_df = app.trajectories_df.loc[app.trajectories_df["id"] != app.traj_id_now]
         traj_del = copy.deepcopy(app.traj_id_now)
+        app.traj_finished = True
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, befor=False)
         traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("deleted traj " + str(traj_del) + "; now selected:" + str(app.traj_id_now))
@@ -413,6 +414,8 @@ def click_canvas_callback(event, app):
     app.trajectories_df.loc[len(app.trajectories_df)] = [
         app.traj_id_now, "Unbekannt", app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES), int(event.x / app.video_state["image_resize"]), int(event.y / app.video_state["image_resize"])]
     traj_drawing.draw_frame_with_overlay(app, False)
+    print(app.trajectories_df)
+    print("ausgewählt: " + str(app.traj_id_now))
 
 
     # click_canvas_two_any_number_clicks(event, app)
