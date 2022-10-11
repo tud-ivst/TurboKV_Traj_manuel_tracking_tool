@@ -299,14 +299,16 @@ def jump_frames(event, app, forward):
 
 def finish_traj_r(event, app):
     app.trajectories_df.loc[app.trajectories_df["id"] == app.traj_id_now, "class"] = "Rad"
-    app.traj_finished = True
+    if not app.traj_finished:
+        right_of_way_question(app)
     app.video_state["set_class_mode"] = True
     traj_drawing.draw_frame_with_overlay(app, False)
     app.state_panel.update("finished bike trajectory")
 
 def finish_traj_f(event, app):
     app.trajectories_df.loc[app.trajectories_df["id"]== app.traj_id_now, "class"] = "Fuß"
-    app.traj_finished = True
+    if not app.traj_finished:
+        right_of_way_question(app)
     app.video_state["set_class_mode"] = True
     traj_drawing.draw_frame_with_overlay(app, False)
     app.state_panel.update("finished pedestrian trajectory")
@@ -362,6 +364,23 @@ def get_next_id(app, source_id, id_befor):
     return (id, frameskip)
 
 
+def right_of_way_question(app):
+    app.gui["toplevelwindow"] = tk.Toplevel(app.window)
+    app.gui["toplevelwindow"].title("Was the road user deprived of his right of way?")
+    app.gui["toplevelwindow"].geometry("600x" + str(24*27))
+    text = tk.Text(app.gui["toplevelwindow"], height=20, width=100)
+    text.grid(row=0, column=0)
+    text.insert(tk.END, "T - Was not deprived\nG - Was deprived")
+    text.config(state="disabled")
+    app.gui["toplevelwindow"].bind("g", lambda event: right_of_way_answer(event, app=app, deprived=True))
+    app.gui["toplevelwindow"].bind("t", lambda event: right_of_way_answer(event, app=app, deprived=False))
+
+def right_of_way_answer(event, app, deprived):
+    app.trajectories_df.loc[app.trajectories_df["id"]==app.traj_id_now, "deprived"] = deprived
+    app.gui["toplevelwindow"].destroy()
+    app.traj_finished = True
+
+
 
 def mouse_wheel(event, app):
     """event for jump forward or backward in the video witht he mouse wheel
@@ -404,7 +423,7 @@ def click_canvas_callback(event, app):
             app.traj_finished = False
     # add point
     app.trajectories_df.loc[len(app.trajectories_df)] = [
-        app.traj_id_now, "Unbekannt", app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES), int(event.x / app.video_state["image_resize"]), int(event.y / app.video_state["image_resize"])]
+        app.traj_id_now, "Unbekannt", app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES), int(event.x / app.video_state["image_resize"]), int(event.y / app.video_state["image_resize"]), None]
     traj_drawing.draw_frame_with_overlay(app, False)
     print(app.trajectories_df)
     print("ausgewählt: " + str(app.traj_id_now))

@@ -48,7 +48,7 @@ class App:
             "show_markers": True
         }
         self.gui = {}
-        self.trajectories_df = pd.DataFrame(columns=["id","class", "frame" ,"x", "y"])
+        self.trajectories_df = pd.DataFrame(columns=["id","class", "frame" ,"x", "y", "deprived"])
         self.traj_id_now = 0
         self.traj_finished = True
         self.traj_colors = {
