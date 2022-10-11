@@ -367,10 +367,11 @@ def get_next_id(app, source_id, id_befor):
 def right_of_way_question(app):
     app.gui["toplevelwindow"] = tk.Toplevel(app.window)
     app.gui["toplevelwindow"].title("Was the road user deprived of his right of way?")
-    app.gui["toplevelwindow"].geometry("600x" + str(24*27))
-    text = tk.Text(app.gui["toplevelwindow"], height=20, width=100)
+    app.gui["toplevelwindow"].geometry("600x80")
+    app.gui["toplevelwindow"].focus_force()
+    text = tk.Text(app.gui["toplevelwindow"], height=3, width=50)
     text.grid(row=0, column=0)
-    text.insert(tk.END, "T - Was not deprived\nG - Was deprived")
+    text.insert(tk.END, "Press T - Was not deprived\nPress G - Was deprived")
     text.config(state="disabled")
     app.gui["toplevelwindow"].bind("g", lambda event: right_of_way_answer(event, app=app, deprived=True))
     app.gui["toplevelwindow"].bind("t", lambda event: right_of_way_answer(event, app=app, deprived=False))
@@ -379,6 +380,7 @@ def right_of_way_answer(event, app, deprived):
     app.trajectories_df.loc[app.trajectories_df["id"]==app.traj_id_now, "deprived"] = deprived
     app.gui["toplevelwindow"].destroy()
     app.traj_finished = True
+    app.window.grab_set()
 
 
 
