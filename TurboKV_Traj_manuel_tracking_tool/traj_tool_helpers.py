@@ -131,7 +131,7 @@ def query_video_keys(video_state):
         int: frameskip in ms
     """
     # value if nothing was pressed
-    frameskip = 0
+    frameskip = video_state["current_frameskip"]
     # jump forward or backward, 4 diffrent options, all in ms
     if video_state["forward"] and video_state["change_frameskip_size"]:
         frameskip = 750
@@ -174,30 +174,18 @@ def update_video_frame(app):
         # query if a video hotkey was pressed
         # as for loop propably slower
 
-        app.video_state["current_frameskip"] = query_video_keys(app.video_state)
-        current_frameskip = app.video_state["current_frameskip"] 
+        current_frameskip = query_video_keys(app.video_state)
         # autosave
         if time.time() - app.video_state["last_save_time"] > 600:
             safe_traj(app, auto_save=True)
             app.video_state["last_save_time"] = time.time()
-        # delete the events of the last object if del/entf key get pressed
-        # if app.mtc["video_state"]["delete"]:
-        #     if not app.mtc["event_state_dict"]["event_history_df"].empty:
-        #         app.mtc["event_state_dict"]["event_history_df"] = delete_last_object(
-        #             app.mtc["event_state_dict"]["event_history_df"],
-        #             app.mtc["event_state_dict"]["status_mouse"],
-        #             video
-        #         )
-        #     app.mtc["video_state"]["delete"] = False
-        #     print(app.mtc["event_state_dict"]["event_history_df"])
-        #     # set frameskip 0, because if not set --> None --> no read of video --> no actual frame
-        #     traj_drawing.draw_frame_with_overlay(app, False, frameskip=0)
 
 
         # draw the actual frame if not paused or there is a frameskip
         if not app.video_state["pause"] or current_frameskip != 0:
             change_current_video_position(app, current_frameskip)
             traj_drawing.draw_frame_with_overlay(app, False, frameskip=current_frameskip)
+            app.video_state["current_frameskip"]=0
         # sleep time to get a normal speed (ca.)
         time.sleep(0.001)
 
@@ -325,13 +313,13 @@ def finish_traj_f(event, app):
 
 def jump_traj_befor(event, app):
     if app.traj_finished == True and not app.trajectories_df.empty:
-        (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, befor=True)
+        (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=True)
         traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("selected trajectory befor")
 
 def jump_traj_after(event, app):
     if app.traj_finished == True and not app.trajectories_df.empty:    
-        (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, befor=False)
+        (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=False)
         traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("selected next trajectory")
 
@@ -341,13 +329,13 @@ def del_traj(event, app):
         app.trajectories_df = app.trajectories_df.loc[app.trajectories_df["id"] != app.traj_id_now]
         traj_del = copy.deepcopy(app.traj_id_now)
         app.traj_finished = True
-        (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, befor=False)
+        (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=False)
         traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("deleted traj " + str(traj_del) + "; now selected:" + str(app.traj_id_now))
 
 
-def get_next_id(app, source_id, befor):
-    if befor:
+def get_next_id(app, source_id, id_befor):
+    if id_befor:
         selected_df = app.trajectories_df.loc[app.trajectories_df["id"] < source_id]
     else:
         selected_df = app.trajectories_df.loc[app.trajectories_df["id"] > source_id]
@@ -355,19 +343,23 @@ def get_next_id(app, source_id, befor):
         if source_id in app.trajectories_df["id"].to_list():
             id = copy.deepcopy(source_id) 
         else:
-            if befor:
+            if id_befor:
                 id = app.trajectories_df["id"].min()
             else:
                 id = app.trajectories_df["id"].max()
     else:
-        if befor:
+        if id_befor:
             id = selected_df["id"].max()
         else:
             id = selected_df["id"].min()
 
     # get frame of first traj point
     traj_df = app.trajectories_df.loc[app.trajectories_df["id"]==id].reset_index(drop=True)
-    return (id, app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES) - traj_df.at[0,"id"])
+    if traj_df.empty:
+        frameskip=0
+    else:
+        frameskip = int(traj_df.at[0,"frame"] - app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES))
+    return (id, frameskip)
 
 
 

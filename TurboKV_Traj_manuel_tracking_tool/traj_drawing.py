@@ -62,7 +62,6 @@ def draw_lines(app, frame, frame_range):
     points_of_traj_in_range = points_of_traj_in_range.copy()
     points_of_traj_in_range["x2"] = [None] + points_of_traj_in_range["x"].to_list()[:-1]
     points_of_traj_in_range["y2"] = [None] + points_of_traj_in_range["y"].to_list()[:-1]
-    print(points_of_traj_in_range)
     for index in ids_traj_to_show:
         
         points_of_traj = points_of_traj_in_range.loc[points_of_traj_in_range["id"]==index]
