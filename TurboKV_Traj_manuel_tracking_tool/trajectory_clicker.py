@@ -145,6 +145,9 @@ def help_text():
         "F                        " + " - finish pedestrian trajectory" +  "\n" +
         "R                        " + " - finish biker trajectory" +  "\n" +
         "Space                    " + " - play/pause" +  "\n" +
+        "T (only after F/R)       " + " - was not deprived in right of way" +  "\n" +
+        "G (only after F/R)       " + " - was deprived in right of way" +  "\n" +
+
         "\n"+"all 10 min the program safe the trajectory data as safety"
         "\n"+"safes always at the video location and under the same name (auto_save named diffrently)"
         "\n"+"change Name if you track a video in muliple sessions"
