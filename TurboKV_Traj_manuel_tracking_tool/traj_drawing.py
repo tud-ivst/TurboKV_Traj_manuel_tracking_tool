@@ -53,9 +53,12 @@ def draw_lines(app, frame, frame_range):
 
     """
     current_frame = app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES)
-    points_in_range = app.trajectories_df.loc[
-        (current_frame - frame_range/2 < app.trajectories_df["frame"]) &
-        (app.trajectories_df["frame"] < current_frame + frame_range/2)]
+    if app.video_state["show_all_markers"]:
+        points_in_range = app.trajectories_df.copy()
+    else:
+        points_in_range = app.trajectories_df.loc[
+            (current_frame - frame_range/2 < app.trajectories_df["frame"]) &
+            (app.trajectories_df["frame"] < current_frame + frame_range/2)]
     ids_traj_to_show = points_in_range["id"].unique().tolist() + [copy.deepcopy(app.traj_id_now)]
     points_of_traj_in_range = app.trajectories_df.loc[app.trajectories_df["id"].isin(ids_traj_to_show)]
     # if not copy() --> copy warning for some reason
@@ -208,10 +211,13 @@ def draw_traj_points(app, frame, frame_range, small_frame_range=12):
     # points of the selected traj
     points_selected = app.trajectories_df.loc[selection]
     # points in the framerange, but not selected
-    points_in_framerange = app.trajectories_df.loc[
-        (current_frame - frame_range/2 < app.trajectories_df["frame"]) &
-        (app.trajectories_df["frame"] < current_frame + frame_range/2) 
-        & ~selection]
+    if app.video_state["show_all_markers"]:
+        points_in_framerange = app.trajectories_df.loc[~selection]
+    else:
+        points_in_framerange = app.trajectories_df.loc[
+            (current_frame - frame_range/2 < app.trajectories_df["frame"]) &
+            (app.trajectories_df["frame"] < current_frame + frame_range/2) 
+            & ~selection]
     selection = (
         (current_frame - small_frame_range/2 < points_selected["frame"])
         & (points_selected["frame"] < current_frame + small_frame_range/2))

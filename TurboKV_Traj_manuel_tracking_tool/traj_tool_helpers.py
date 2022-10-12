@@ -183,6 +183,7 @@ def update_video_frame(app):
 
         # draw the actual frame if not paused or there is a frameskip
         if not app.video_state["pause"] or current_frameskip != 0:
+            app.video_state["current_frameskip"] = current_frameskip
             change_current_video_position(app, current_frameskip)
             traj_drawing.draw_frame_with_overlay(app, False, frameskip=current_frameskip)
             app.video_state["current_frameskip"]=0
@@ -260,6 +261,7 @@ def keybindings(app):
     app.window.bind("w", lambda event: jump_frames(event, app=app, forward=True))
 
     app.window.bind("e", lambda event: disable_markers(event, app=app))
+    app.window.bind("a", lambda event: disable_all_markers(event, app=app))
 
     # del
     app.window.bind("<Delete>", lambda event: del_traj(event, app=app))
@@ -273,6 +275,15 @@ def disable_markers(event, app):
         app.state_panel.update("show markers")
     app.video_state["show_markers"] = not app.video_state["show_markers"]
     traj_drawing.draw_frame_with_overlay(app, False)
+def disable_all_markers(event, app):
+    if app.video_state["show_all_markers"]:
+        app.state_panel.update("show not all markers")
+    else:
+        app.state_panel.update("show all markers")
+    app.video_state["show_all_markers"] = not app.video_state["show_all_markers"]
+    traj_drawing.draw_frame_with_overlay(app, False)
+
+
 
 def pause_play(event, app):
     if app.video_state["pause"]:

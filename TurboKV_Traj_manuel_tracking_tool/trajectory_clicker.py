@@ -45,7 +45,8 @@ class App:
             "set_class_mode":False,
             "last_save_time":None,
             "image_resize":0.6,
-            "show_markers": True
+            "show_markers": True,
+            "show_all_markers": False
         }
         self.gui = {}
         self.trajectories_df = pd.DataFrame(columns=["id","class", "frame" ,"x", "y", "deprived"])
@@ -144,6 +145,7 @@ def help_text():
         "Delete                   " + " - delete selected trajectory (marked magenta)" +  "\n" +
         "F                        " + " - finish pedestrian trajectory" +  "\n" +
         "R                        " + " - finish biker trajectory" +  "\n" +
+        "A                        " + " - show all trajectories" +  "\n" +
         "Space                    " + " - play/pause" +  "\n" +
         "T (only after F/R)       " + " - was not deprived in right of way" +  "\n" +
         "G (only after F/R)       " + " - was deprived in right of way" +  "\n" +
