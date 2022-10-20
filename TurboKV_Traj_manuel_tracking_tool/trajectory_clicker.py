@@ -46,7 +46,9 @@ class App:
             "last_save_time":None,
             "image_resize":0.6,
             "show_markers": True,
-            "show_all_markers": False
+            "show_all_markers": False,
+            "draw_new": False,
+            "every_x_frame":None
         }
         self.gui = {}
         self.trajectories_df = pd.DataFrame(columns=["id","class", "frame" ,"x", "y", "deprived"])

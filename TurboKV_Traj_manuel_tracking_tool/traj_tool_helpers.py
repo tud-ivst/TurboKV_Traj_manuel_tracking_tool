@@ -170,7 +170,7 @@ def update_video_frame(app):
         not app.video_state["escape"] 
         and not app.video_state["close"] 
     ):
-
+        befor = time.time()
         # query if a video hotkey was pressed
         # as for loop propably slower
 
@@ -182,11 +182,22 @@ def update_video_frame(app):
 
 
         # draw the actual frame if not paused or there is a frameskip
-        if not app.video_state["pause"] or current_frameskip != 0:
+        if not app.video_state["pause"] or current_frameskip != 0 or app.video_state["draw_new"]:
+            
             app.video_state["current_frameskip"] = current_frameskip
+            print(app.video_state["current_frameskip"])
             change_current_video_position(app, current_frameskip)
             traj_drawing.draw_frame_with_overlay(app, False, frameskip=current_frameskip)
             app.video_state["current_frameskip"]=0
+            app.video_state["draw_new"] = False
+            # play in real time
+            cal_time = time.time()-befor
+            if app.video_state["every_x_frame"] is None:
+                app.video_state["every_x_frame"] = cal_time // (1 / app.video["fps"])
+            sleep_time = cal_time - 1/app.video_state["every_x_frame"] 
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+            
         # sleep time to get a normal speed (ca.)
         time.sleep(0.001)
 
@@ -283,11 +294,10 @@ def disable_all_markers(event, app):
     app.video_state["show_all_markers"] = not app.video_state["show_all_markers"]
     traj_drawing.draw_frame_with_overlay(app, False)
 
-
-
 def pause_play(event, app):
     if app.video_state["pause"]:
         app.state_panel.update("play")
+        app.video_state["time_for_loading"] = None
     else:
         app.state_panel.update("pause")
     app.video_state["pause"] = not app.video_state["pause"]
@@ -327,11 +337,13 @@ def finish_traj_f(event, app):
 def jump_traj_befor(event, app):
     if app.traj_finished == True and not app.trajectories_df.empty:
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=True)
+        app.video_state["draw_new"] = True # always draw new frame, even if frameskip = 0
         app.state_panel.update("selected trajectory befor")
 
 def jump_traj_after(event, app):
     if app.traj_finished == True and not app.trajectories_df.empty:    
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=False)
+        app.video_state["draw_new"] = True # always draw new frame, even if frameskip = 0
         app.state_panel.update("selected next trajectory")
 
 # delete selected traj
@@ -341,6 +353,7 @@ def del_traj(event, app):
         traj_del = copy.deepcopy(app.traj_id_now)
         app.traj_finished = True
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=False)
+        app.video_state["draw_new"] = True # always draw new frame, even if frameskip = 0
         app.state_panel.update("deleted traj " + str(traj_del) + "; now selected:" + str(app.traj_id_now))
 
 

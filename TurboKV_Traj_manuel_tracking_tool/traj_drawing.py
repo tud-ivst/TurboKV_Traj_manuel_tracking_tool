@@ -4,6 +4,7 @@ import copy
 import cv2
 import tkinter as tk
 import numpy as np
+import time
 
 def draw_a_cross(frame, mid_x, mid_y, radius, color, thickness):
     """function for a cross, background cross and upper color cross use same function
@@ -248,6 +249,9 @@ def get_frame(app):
         [type]: [description]
     """
     if app.video["video_capture"].isOpened():
+        # to get real time if video is played
+        if app.video_state["every_x_frame"] is not None and not app.video_state["pause"] and app.video_state["current_frameskip"]==0:
+            app.video_state["current_frameskip"] = copy.deepcopy(app.video_state["every_x_frame"])
         # if it is just a small step in the same video --> change by grab()
         # because grab is way faster than always set the wanted time
         if 27 > app.video_state["current_frameskip"] > 0:
@@ -282,8 +286,9 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
     ret = True # default
     # just get the last showen frame if paused, but something got changed 
     # (gates for example)
-    # draw_frame_with_overlay only get called if something got changed or
+    # draw_frame_with overlay only get called if something got changed or
     # the video is not paused
+    befor = time.time()
     if app.video["last_showen_frame"] is not None and (app.video_state["set_class_mode"] or (app.video_state["pause"] and frameskip is None)):
         frame = copy.copy(app.video["last_showen_frame"])
         app.video_state["set_class_mode"] = False
@@ -292,6 +297,8 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
         # set last showen frame
         if ret:
             app.video["last_showen_frame"] = copy.copy(frame)
+    print("get frame: "+str(time.time()-befor))
+    befor = time.time()
     # only go forward if frame is valid (ret) or just the 
     if ret:
         current_frame=app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES)
@@ -301,12 +308,20 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
             frame_range=100
             frame = draw_lines(app, frame, frame_range=frame_range)
             frame = draw_traj_points(app, frame, frame_range=frame_range)
+        print("draw things: "+str(time.time()-befor))
+        befor = time.time()
         image = PIL.Image.fromarray(frame)
+        print("fromarry: "+str(time.time()-befor))
+        befor = time.time()
         image = image.resize(
             (int(app.video["width"]*app.video_state["image_resize"]), 
             int(app.video["height"]*app.video_state["image_resize"])), PIL.Image.ANTIALIAS)
+        print("resize: "+str(time.time()-befor))
+        befor = time.time()
         image = PIL.ImageTk.PhotoImage(image=image)
         app.canvas.create_image(0, 0, image=image, anchor=tk.NW)
         # to solve flickering
         app.canvas.image = image
+        print("to canvas: "+str(time.time()-befor))
+        befor = time.time()
 
