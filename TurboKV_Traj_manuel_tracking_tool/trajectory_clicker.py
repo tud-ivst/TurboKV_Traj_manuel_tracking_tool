@@ -41,7 +41,7 @@ class App:
             "backward_frame": False,
             "forward": False,
             "backward": False,
-            "change_frameskip_size":True,
+            "change_frameskip_size":False,
             "set_class_mode":False,
             "last_save_time":None,
             "image_resize":0.6,

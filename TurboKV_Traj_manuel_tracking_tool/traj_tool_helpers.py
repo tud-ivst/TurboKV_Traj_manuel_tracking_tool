@@ -389,6 +389,9 @@ def right_of_way_answer(event, app, deprived):
     app.gui["toplevelwindow"].destroy()
     app.traj_finished = True
     app.window.grab_set()
+    # jump to frame of the start of the traj
+    traj_df = app.trajectories_df.loc[app.trajectories_df["id"]==app.traj_id_now].reset_index(drop=True)
+    app.video_state["current_frameskip"] = int(traj_df.at[0,"frame"] - app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES))
 
 
 
