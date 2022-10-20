@@ -152,10 +152,10 @@ def query_video_keys(video_state):
         frameskip = -2
         video_state["backward_frame"] = False
     elif video_state["forward_frame"] and not video_state["change_frameskip_size"]:
-        frameskip = 20
+        frameskip = 25
         video_state["forward_frame"] = False
     elif video_state["backward_frame"] and not video_state["change_frameskip_size"]:
-        frameskip = -20
+        frameskip = -25
         video_state["backward_frame"] = False
 
     return frameskip
@@ -380,9 +380,9 @@ def right_of_way_question(app):
     app.gui["toplevelwindow"].title("Was the road user deprived of his right of way?")
     app.gui["toplevelwindow"].geometry("600x80")
     app.gui["toplevelwindow"].focus_force()
-    text = tk.Text(app.gui["toplevelwindow"], height=3, width=50)
+    text = tk.Text(app.gui["toplevelwindow"], height=3, width=70)
     text.grid(row=0, column=0)
-    text.insert(tk.END, "Press T - Was not deprived\nPress G - Was deprived")
+    text.insert(tk.END, "Press T - Was not deprived (Vorfahrt wurde der Person gewährt oder hat keine)\nPress G - Was deprived (Vorfahrt wurde der Person genommen)")
     text.config(state="disabled")
     app.gui["toplevelwindow"].bind("g", lambda event: right_of_way_answer(event, app=app, deprived=True))
     app.gui["toplevelwindow"].bind("t", lambda event: right_of_way_answer(event, app=app, deprived=False))
@@ -437,6 +437,8 @@ def click_canvas_callback(event, app):
     # add point
     app.trajectories_df.loc[len(app.trajectories_df)] = [
         app.traj_id_now, "Unbekannt", app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES), int(event.x / app.video_state["image_resize"]), int(event.y / app.video_state["image_resize"]), None]
+    # jump 25 frames
+    app.video_state["current_frameskip"] = 25
     traj_drawing.draw_frame_with_overlay(app, False)
     print(app.trajectories_df)
     print("ausgewählt: " + str(app.traj_id_now))
