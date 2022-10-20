@@ -327,13 +327,11 @@ def finish_traj_f(event, app):
 def jump_traj_befor(event, app):
     if app.traj_finished == True and not app.trajectories_df.empty:
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=True)
-        traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("selected trajectory befor")
 
 def jump_traj_after(event, app):
     if app.traj_finished == True and not app.trajectories_df.empty:    
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=False)
-        traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("selected next trajectory")
 
 # delete selected traj
@@ -343,7 +341,6 @@ def del_traj(event, app):
         traj_del = copy.deepcopy(app.traj_id_now)
         app.traj_finished = True
         (app.traj_id_now,  app.video_state["current_frameskip"]) = get_next_id(app, app.traj_id_now, id_befor=False)
-        traj_drawing.draw_frame_with_overlay(app, False)
         app.state_panel.update("deleted traj " + str(traj_del) + "; now selected:" + str(app.traj_id_now))
 
 
@@ -430,16 +427,17 @@ def click_canvas_callback(event, app):
     if app.trajectories_df.empty:
         app.traj_id_now = 0
         app.traj_finished = False
+        new_index = 0
     else:
+        new_index = list(app.trajectories_df.index)[-1] + 1
         if app.traj_finished:
             app.traj_id_now = app.trajectories_df["id"].max() + 1
             app.traj_finished = False
     # add point
-    app.trajectories_df.loc[len(app.trajectories_df)] = [
+    app.trajectories_df.loc[new_index] = [
         app.traj_id_now, "Unbekannt", app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES), int(event.x / app.video_state["image_resize"]), int(event.y / app.video_state["image_resize"]), None]
     # jump 25 frames
     app.video_state["current_frameskip"] = 25
-    traj_drawing.draw_frame_with_overlay(app, False)
     print(app.trajectories_df)
     print("ausgewählt: " + str(app.traj_id_now))
 
