@@ -127,8 +127,8 @@ class App:
 def help(app):
     app.gui["toplevelwindow"] = tk.Toplevel(app.window)
     app.gui["toplevelwindow"].title("Help")
-    app.gui["toplevelwindow"].geometry("600x" + str(24*27))
-    text = tk.Text(app.gui["toplevelwindow"], height=20, width=100)
+    app.gui["toplevelwindow"].geometry("800x" + str(18*27))
+    text = tk.Text(app.gui["toplevelwindow"], height=24, width=100)
     text.grid(row=0, column=0)
     text.insert(tk.END, help_text())
     text.config(state="disabled")
@@ -155,6 +155,7 @@ def help_text():
         "\n"+"all 10 min the program safe the trajectory data as safety"
         "\n"+"safes always at the video location and under the same name (auto_save named diffrently)"
         "\n"+"change Name if you track a video in muliple sessions"
+        "\n"+"circles of selected traj are pink"
 
 
     )

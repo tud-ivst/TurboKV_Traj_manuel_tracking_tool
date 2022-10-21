@@ -212,7 +212,7 @@ def end_counting(app, toplevelwindow):
     """
     if not toplevelwindow is None:
         toplevelwindow.destroy()
-    app.state_panel.update("end the manual traffic counting")
+    app.state_panel.update("end the tracking")
 
 def continue_counting(app, toplevelwindow):
     """continue with the video for counting
@@ -243,7 +243,7 @@ def escape_window(app):
     label = tk.Label(toplevelwindow, text="What do you want to do?")
     label.grid(row=0, column=0, columnspan=2, padx='5', pady='3')
 
-    continue_counting_button = tk.Button(toplevelwindow, text="Continue counting", command = lambda : continue_counting(app, toplevelwindow))
+    continue_counting_button = tk.Button(toplevelwindow, text="Continue tracking", command = lambda : continue_counting(app, toplevelwindow))
     continue_counting_button.grid(row=1, column=0, padx='5', pady='3', sticky='w')
 
     end_counting_button = tk.Button(toplevelwindow, text="End counting", command = lambda : end_counting(app, toplevelwindow))
@@ -386,11 +386,13 @@ def get_next_id(app, source_id, id_befor):
 
 
 def right_of_way_question(app):
+    traj_df = app.trajectories_df.loc[app.trajectories_df["id"]==app.traj_id_now].reset_index(drop=True)
+    app.video_state["current_frameskip"] = int(traj_df.at[0,"frame"] - app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES))
     app.gui["toplevelwindow"] = tk.Toplevel(app.window)
     app.gui["toplevelwindow"].title("Was the road user deprived of his right of way?")
-    app.gui["toplevelwindow"].geometry("600x80")
+    app.gui["toplevelwindow"].geometry("800x70")
     app.gui["toplevelwindow"].focus_force()
-    text = tk.Text(app.gui["toplevelwindow"], height=3, width=70)
+    text = tk.Text(app.gui["toplevelwindow"], height=3, width=90)
     text.grid(row=0, column=0)
     text.insert(tk.END, "Press T - Was not deprived (Vorfahrt wurde der Person gewährt oder hat keine)\nPress G - Was deprived (Vorfahrt wurde der Person genommen)")
     text.config(state="disabled")
