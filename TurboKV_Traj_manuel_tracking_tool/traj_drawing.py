@@ -251,7 +251,7 @@ def get_frame(app):
     if app.video["video_capture"].isOpened():
         # to get real time if video is played
         if app.video_state["every_x_frame"] is not None and not app.video_state["pause"] and app.video_state["current_frameskip"]==0:
-            app.video_state["current_frameskip"] = copy.deepcopy(app.video_state["every_x_frame"])
+            app.video_state["current_frameskip"] = np.round(app.video_state["every_x_frame"])
         # if it is just a small step in the same video --> change by grab()
         # because grab is way faster than always set the wanted time
         if 27 > app.video_state["current_frameskip"] > 0:
@@ -280,7 +280,6 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
         same_tracks_frame (bool, optional): use a already build frame. Defaults to False.
         frameskip (int, optional): None if no frameskip. Defaults to None.
     """
-    # print(frameskip)
     if first_frame:
         app.video["video_capture"].set(cv2.CAP_PROP_POS_FRAMES, 0)
     ret = True # default
@@ -297,7 +296,7 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
         # set last showen frame
         if ret:
             app.video["last_showen_frame"] = copy.copy(frame)
-    print("get frame: "+str(time.time()-befor))
+    #print("get frame: "+str(time.time()-befor))
     befor = time.time()
     # only go forward if frame is valid (ret) or just the 
     if ret:
@@ -308,20 +307,20 @@ def draw_frame_with_overlay(app, first_frame, frameskip=None):
             frame_range=100
             frame = draw_lines(app, frame, frame_range=frame_range)
             frame = draw_traj_points(app, frame, frame_range=frame_range)
-        print("draw things: "+str(time.time()-befor))
+        #print("draw things: "+str(time.time()-befor))
         befor = time.time()
         image = PIL.Image.fromarray(frame)
-        print("fromarry: "+str(time.time()-befor))
+        #print("fromarry: "+str(time.time()-befor))
         befor = time.time()
         image = image.resize(
             (int(app.video["width"]*app.video_state["image_resize"]), 
             int(app.video["height"]*app.video_state["image_resize"])), PIL.Image.ANTIALIAS)
-        print("resize: "+str(time.time()-befor))
+        #print("resize: "+str(time.time()-befor))
         befor = time.time()
         image = PIL.ImageTk.PhotoImage(image=image)
         app.canvas.create_image(0, 0, image=image, anchor=tk.NW)
         # to solve flickering
         app.canvas.image = image
-        print("to canvas: "+str(time.time()-befor))
+        #print("to canvas: "+str(time.time()-befor))
         befor = time.time()
 

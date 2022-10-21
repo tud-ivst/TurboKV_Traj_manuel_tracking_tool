@@ -10,7 +10,7 @@ import TurboKV_Traj_manuel_tracking_tool.traj_drawing as traj_drawing
 from pathlib import Path
 import os
 import time
-
+import numpy as np
 class StatePanel:
     """feedback information for the user
     """
@@ -193,7 +193,7 @@ def update_video_frame(app):
             # play in real time
             cal_time = time.time()-befor
             if app.video_state["every_x_frame"] is None:
-                app.video_state["every_x_frame"] = cal_time // (1 / app.video["fps"])
+                app.video_state["every_x_frame"] = int(np.round(cal_time // (1 / app.video["fps"])))
             sleep_time = cal_time - 1/app.video_state["every_x_frame"] 
             if sleep_time > 0:
                 time.sleep(sleep_time)
@@ -440,22 +440,23 @@ def click_canvas_callback(event, app):
         app (dict): main dict
     """
     # has to be sorted
-    if app.trajectories_df.empty:
-        app.traj_id_now = 0
-        app.traj_finished = False
-        new_index = 0
-    else:
-        new_index = list(app.trajectories_df.index)[-1] + 1
-        if app.traj_finished:
-            app.traj_id_now = app.trajectories_df["id"].max() + 1
+    if app.video_state["pause"]:
+        if app.trajectories_df.empty:
+            app.traj_id_now = 0
             app.traj_finished = False
-    # add point
-    app.trajectories_df.loc[new_index] = [
-        app.traj_id_now, "Unbekannt", app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES), int(event.x / app.video_state["image_resize"]), int(event.y / app.video_state["image_resize"]), None]
-    # jump 25 frames
-    app.video_state["current_frameskip"] = 25
-    print(app.trajectories_df)
-    print("ausgewählt: " + str(app.traj_id_now))
+            new_index = 0
+        else:
+            new_index = list(app.trajectories_df.index)[-1] + 1
+            if app.traj_finished:
+                app.traj_id_now = app.trajectories_df["id"].max() + 1
+                app.traj_finished = False
+        # add point
+        app.trajectories_df.loc[new_index] = [
+            app.traj_id_now, "Unbekannt", app.video["video_capture"].get(cv2.CAP_PROP_POS_FRAMES), int(event.x / app.video_state["image_resize"]), int(event.y / app.video_state["image_resize"]), None]
+        # jump 25 frames
+        app.video_state["current_frameskip"] = 25
+        print(app.trajectories_df)
+        print("ausgewählt: " + str(app.traj_id_now))
 
 
     # click_canvas_two_any_number_clicks(event, app)
