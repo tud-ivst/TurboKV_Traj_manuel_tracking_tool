@@ -10,5 +10,5 @@ track trajectories of people and vehicles in a video
 ### Windows
 
 1. Clone this repository
-2. Click on .\TurboKV_Traj_manuel_tracking_tool\Install.bat (a venv will be created and packages from requirements.txt will be installed
+2. Click on .\TurboKV_Traj_manuel_tracking_tool\install_win-py39.bat (a venv will be created and packages from requirements.txt will be installed
 3. Click on .\TurboKV_Traj_manuel_tracking_tool\TurboKV_Traj_manuel_tracking_tool.bat (venv will be activated and OTVision gui will be started)
