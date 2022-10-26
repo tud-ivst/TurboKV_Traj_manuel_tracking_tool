@@ -4,6 +4,7 @@ track trajectories of people and vehicles in a video
 ## Prequesites
 
 1. Python 3.9.x (add to PATH while installation)
+2. Microsoft Visual C++ 14.0 or greater (Get it with "Microsoft C++ Build Tools": https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 ## Installation
 
