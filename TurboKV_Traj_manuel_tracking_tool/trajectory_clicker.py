@@ -67,6 +67,7 @@ class App:
         self.window.config(menu=self.menu_bar)
         self.menu_bar.add_command(label="Load Video", command=lambda: self.load_video_draw_first_frame())
         self.menu_bar.add_command(label="Save Trajectory Data", command=lambda: traj_tool_helpers.safe_traj(self))
+        self.menu_bar.add_command(label="Load Trajectory Data", command=lambda: self.load_traj())
         self.menu_bar.add_command(label="Help", command=lambda: help(self))
 
     def load_video_draw_first_frame(self):
@@ -95,6 +96,12 @@ class App:
         traj_tool_helpers.keybindings(self)
         video_playback = traj_tool_helpers.Thread(self.queue, self, "video_playback").start()
         self.window.after(100, self.process_queue)
+
+    def load_traj(self):
+        filepath = filedialog.askopenfilename(parent=self.window)
+        self.trajectories_df = pd.read_csv(filepath, delimiter=";", index_col=0)
+        self.state_panel.update("loaded traj data")
+
     def process_queue(self):
         """recursion that stops if the threaded process of mtc is done --> 
         show the escape toplevelwindow, make the tkinter gui still available
